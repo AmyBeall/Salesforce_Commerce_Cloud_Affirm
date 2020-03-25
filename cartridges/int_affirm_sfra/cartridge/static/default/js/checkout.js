@@ -1315,6 +1315,8 @@ module.exports = {
             $.each(response.serverErrors, function (index, element) {
               createErrorNotification(element);
             });
+          } else if (response.redirectUrl) {
+            window.location.href = response.redirectUrl;
           }
         } else {
           // Update UI from response
@@ -1523,7 +1525,14 @@ function updateOrderProductSummaryInformation(order) {
     $shippingSummary.html(tmpl.html());
     $productSummary.append($shippingSummary);
   });
-  $('.product-summary-block').html($productSummary.html());
+  $('.product-summary-block').html($productSummary.html()); // Also update the line item prices, as they might have been altered
+
+  $('.grand-total-price').text(order.totals.subTotal);
+  order.items.items.forEach(function (item) {
+    if (item.priceTotal && item.priceTotal.renderedPrice) {
+      $('.item-total-' + item.UUID).empty().append(item.priceTotal.renderedPrice);
+    }
+  });
 }
 
 module.exports = {
